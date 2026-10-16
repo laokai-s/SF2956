@@ -1,0 +1,82 @@
+{
+  "elapsed_seconds": 5.220825041993521,
+  "parameters": {
+    "min_positive": 3,
+    "max_users": 200,
+    "min_window_users": 10,
+    "grid_size": 401,
+    "include_boundary_windows": false
+  },
+  "windows": [
+    {
+      "label": "2011 H1",
+      "deduplicated_ratings": 5298,
+      "selected_users": 200,
+      "h0_intervals": 200,
+      "h1_intervals": 378
+    },
+    {
+      "label": "2011 H2",
+      "deduplicated_ratings": 2305,
+      "selected_users": 197,
+      "h0_intervals": 197,
+      "h1_intervals": 215
+    },
+    {
+      "label": "2012 H1",
+      "deduplicated_ratings": 3287,
+      "selected_users": 200,
+      "h0_intervals": 200,
+      "h1_intervals": 288
+    },
+    {
+      "label": "2012 H2",
+      "deduplicated_ratings": 3963,
+      "selected_users": 200,
+      "h0_intervals": 200,
+      "h1_intervals": 285
+    },
+    {
+      "label": "2013 H1",
+      "deduplicated_ratings": 3713,
+      "selected_users": 200,
+      "h0_intervals": 200,
+      "h1_intervals": 268
+    },
+    {
+      "label": "2013 H2",
+      "deduplicated_ratings": 2408,
+      "selected_users": 197,
+      "h0_intervals": 197,
+      "h1_intervals": 203
+    },
+    {
+      "label": "2014 H1",
+      "deduplicated_ratings": 1562,
+      "selected_users": 130,
+      "h0_intervals": 130,
+      "h1_intervals": 121
+    },
+    {
+      "label": "2014 H2",
+      "deduplicated_ratings": 1173,
+      "selected_users": 104,
+      "h0_intervals": 104,
+      "h1_intervals": 92
+    },
+    {
+      "label": "2015 H1",
+      "deduplicated_ratings": 217,
+      "selected_users": 22,
+      "h0_intervals": 22,
+      "h1_intervals": 7
+    },
+    {
+      "label": "2015 H2",
+      "deduplicated_ratings": 145,
+      "selected_users": 15,
+      "h0_intervals": 15,
+      "h1_intervals": 5
+    }
+  ]
+}

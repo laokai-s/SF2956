@@ -1,0 +1,464 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Compile with pdfLaTeX, LuaLaTeX, or XeLaTeX.
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{ragged2e}
+
+% ---------- Visual system ----------
+\definecolor{Ink}{HTML}{10243E}
+\definecolor{Ocean}{HTML}{167D9A}
+\definecolor{Sky}{HTML}{DDEFF3}
+\definecolor{Orange}{HTML}{E98032}
+\definecolor{Paper}{HTML}{F7F9FB}
+\definecolor{Muted}{HTML}{607080}
+
+\setbeamercolor{normal text}{fg=Ink,bg=white}
+\setbeamercolor{structure}{fg=Ocean}
+\setbeamercolor{frametitle}{fg=Ink,bg=white}
+\setbeamercolor{title}{fg=Ink}
+\setbeamercolor{subtitle}{fg=Muted}
+\setbeamercolor{alerted text}{fg=Orange}
+\setbeamercolor{block title}{fg=white,bg=Ocean}
+\setbeamercolor{block body}{fg=Ink,bg=Sky!50}
+\setbeamercolor{footline}{fg=Muted,bg=white}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{Ocean}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{Ocean}$\bullet$}
+\setbeamertemplate{enumerate item}{\color{Ocean}\insertenumlabel.}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{frametitle}{%
+  \vspace{0.35cm}\insertframetitle\par
+  \vspace{0.10cm}{\color{Ocean}\rule{\textwidth}{0.8pt}}
+}
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \hbox{%
+    \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.8ex,dp=1.2ex,leftskip=.55cm]{footline}%
+      SF2956 Topological Data Analysis
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.8ex,dp=1.2ex,rightskip=.55cm plus1fil]{footline}%
+      \insertframenumber/\inserttotalframenumber
+    \end{beamercolorbox}%
+  }
+}
+
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{footline}{size=\scriptsize}
+\setbeamerfont{block title}{series=\bfseries}
+
+\newcommand{\term}[1]{\textcolor{Ocean}{\textbf{#1}}}
+\newcommand{\caution}[1]{\textcolor{Orange}{\textbf{#1}}}
+\newcommand{\source}[1]{\vfill{\scriptsize\color{Muted}Source: #1}}
+
+% ---------- Metadata ----------
+\title{Topological Analysis of Temporal Trust Structure}
+\subtitle{A proposed study of the Bitcoin Alpha network}
+\author{Xiaoye Ma, Shengkai Sun}
+\institute{SF2956 Topological Data Analysis}
+\date{Project summary, 2026}
+
+\begin{document}
+
+% 1
+\begin{frame}[plain]
+  \vspace{0.8cm}
+  {\color{Ocean}\rule{2.1cm}{3pt}}\\[0.45cm]
+  {\usebeamerfont{title}\color{Ink}\inserttitle\par}
+  \vspace{0.22cm}
+  {\usebeamerfont{subtitle}\color{Muted}\insertsubtitle\par}
+
+  \vfill
+  \begin{block}{Project idea}
+    Compare temporal windows through Jaccard pseudometrics, persistent homology, and distances between Betti curves.
+  \end{block}
+
+  \vfill
+  {\small\insertauthor\hfill\insertinstitute\\[0.12cm]
+  \color{Muted}\insertdate}
+  \note{开场控制在一分钟内。说明这是 proposed project，不是已经完成的结果。主问题是用户信任行为的多尺度结构是否随时间变化。}
+\end{frame}
+
+% 2
+\begin{frame}{Motivation}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.54\textwidth}
+      \begin{itemize}
+        \item Bitcoin Alpha users rated other users from $-10$ to $+10$.
+        \item Each rating has a direction, a sign, a weight, and a timestamp.
+        \item The timestamps allow us to study how trust behaviour changes over time.
+      \end{itemize}
+
+    \column{0.40\textwidth}
+      \begin{block}{Why a topological approach?}
+        Counts describe network size. TDA describes how groups and higher-order structures persist across distance scales.
+      \end{block}
+  \end{columns}
+
+  \vspace{0.45cm}
+  \centering
+  {\large\color{Ink}
+  ratings $\longrightarrow$ behavioural similarity $\longrightarrow$ multi-scale structure}
+  \note{不要把项目说成 Bitcoin 价格预测，也不要声称可以识别诈骗者。强调 ordinary counts 和 multi-scale structure 回答不同问题。}
+\end{frame}
+
+% 3
+\begin{frame}{Bitcoin Alpha dataset}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+      \renewcommand{\arraystretch}{1.18}
+      \begin{tabularx}{\linewidth}{@{}Xr@{}}
+        \toprule
+        \textbf{Property} & \textbf{Value} \\
+        \midrule
+        Users & 3,783 \\
+        Ratings & 24,186 \\
+        Rating range & $-10$ to $+10$ \\
+        Positive ratings & about 93\% \\
+        \bottomrule
+      \end{tabularx}
+
+    \column{0.42\textwidth}
+      \term{One row of data}
+      \[
+        (\text{source},\text{target},\text{rating},\text{time})
+      \]
+      \vspace{0.25cm}
+      \begin{itemize}
+        \item directed
+        \item weighted and signed
+        \item temporal
+      \end{itemize}
+  \end{columns}
+
+  \source{Stanford Network Analysis Project, Bitcoin Alpha trust weighted signed network.}
+  \note{解释四个字段。A 给 B 的评分与 B 给 A 的评分不同。时间戳是项目能够比较不同阶段的关键。}
+\end{frame}
+
+% 4
+\begin{frame}{Research question}
+  \vspace{0.25cm}
+  \begin{block}{Main question}
+    How does the multi-scale topological structure of user trust behaviour change over time?
+  \end{block}
+
+  \vspace{0.25cm}
+  \begin{itemize}
+    \item Do users form groups with similar positive-trust behaviour?
+    \item Do these groups merge differently in early and late windows?
+    \item Do $H_0$ and $H_1$ signatures vary across time?
+    \item Can temporal windows be grouped into distinct regimes?
+  \end{itemize}
+
+  \vspace{0.25cm}
+  \caution{Exploratory claim:} clear groups or temporal regimes may not exist.
+  \note{这一页主动说明我们不会预设 cluster 一定存在。没有明显分组也是有效结果。}
+\end{frame}
+
+% 5
+\begin{frame}{Temporal windows and preprocessing}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.62\textwidth}
+      \begin{enumerate}
+        \item Convert Unix timestamps to dates.
+        \item Divide the data into six-month windows.
+        \item Keep the latest rating for repeated source--target pairs.
+        \item Define ratings above zero as positive trust.
+        \item Retain users with at least three positive ratings.
+        \item Keep at most 200 highly active users per window.
+      \end{enumerate}
+
+    \column{0.32\textwidth}
+      \begin{block}{Course notation}
+        \[
+          I=\{X_d\mid d\in D\}
+        \]
+        $D$: temporal windows\\[0.15cm]
+        $X_d$: active users in window $d$
+      \end{block}
+  \end{columns}
+
+  \vspace{0.25cm}
+  The same rules will be applied to every window.
+  \note{解释半年窗口是初始选择。活跃筛选避免大量空集合，200 人上限控制 H1 计算量。参数可在初步检查后调整，但规则应统一。}
+\end{frame}
+
+% 6
+\begin{frame}{Jaccard pseudometric}
+  For user $u$ in window $d$, define the positive-trust neighbourhood
+  \[
+    T_d(u)=\{v\mid u\text{ positively rates }v\}.
+  \]
+
+  \begin{columns}[T,onlytextwidth]
+    \column{0.55\textwidth}
+      \[
+        d_d(u,v)=1-\frac{|T_d(u)\cap T_d(v)|}{|T_d(u)\cup T_d(v)|}.
+      \]
+      A small distance means that two users positively rate similar people.
+
+    \column{0.39\textwidth}
+      \begin{block}{Small example}
+        \[
+          T(A)=\{D,E,F\}
+        \]
+        \[
+          T(B)=\{D,E,G\}
+        \]
+        \[
+          d(A,B)=1-\frac{2}{4}=0.5
+        \]
+      \end{block}
+  \end{columns}
+
+  \caution{Important:} a small distance does not mean that $A$ directly trusts $B$.
+  \note{解释为什么是 pseudometric：两个不同用户可能信任完全相同的一组人，因此距离为零。方向信息先进入 T_d(u)，随后距离本身是对称的。}
+\end{frame}
+
+% 7
+\begin{frame}{Connection to the course pipeline}
+  \centering
+  \small
+  \begin{tabularx}{0.96\textwidth}{@{}>{\bfseries\color{Ocean}}p{0.29\textwidth}X@{}}
+    \toprule
+    Project step & Course concept \\
+    \midrule
+    Temporal windows & $I=\{X_d\mid d\in D\}$ \\
+    Jaccard distance & Metric restriction and pseudometric \\
+    Groups at scale $t$ & Partitions $X_d/(d_d)_t$ \\
+    Multi-scale clustering & Single linkage and dendrogram \\
+    Geometric construction & Vietoris--Rips filtration \\
+    Topological summary & $H_0$, $H_1$, barcodes, and Betti curves \\
+    Window comparison & $l_1$ distance and hierarchical clustering \\
+    \bottomrule
+  \end{tabularx}
+
+  \vspace{0.35cm}
+  \normalsize
+
+  \note{不逐条证明。老师需要看到数据表示、距离、filtration、homology、piecewise-constant functions 都有清楚对应。}
+\end{frame}
+
+% 8
+\begin{frame}{Multi-scale groups and $H_0$}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+      \term{Single-linkage dendrogram}
+      \begin{itemize}
+        \item At small $t$, only very similar users merge.
+        \item Increasing $t$ produces larger behavioural groups.
+        \item Merge heights record dissimilarity between groups.
+      \end{itemize}
+
+    \column{0.42\textwidth}
+      \term{Zero-dimensional homology}
+      \begin{itemize}
+        \item $H_0$ records connected components.
+        \item A bar dies when one component merges into another.
+        \item A slow decrease of $\beta_0(t)$ indicates dispersed behaviour.
+      \end{itemize}
+  \end{columns}
+
+  \vspace{0.35cm}
+  \begin{block}{Primary analysis}
+    $H_0$ will be the main result because it directly describes how behavioural groups merge across scales.
+  \end{block}
+  \note{连接回用户关于“群体性”的理解。提醒：不是选一个 cut 后才看结果，而是研究整个尺度范围。}
+\end{frame}
+
+% 9
+\begin{frame}{Vietoris--Rips filtration and $H_1$}
+  At scale $t$, connect users when $d_d(u,v)\leq t$ and fill every clique with a simplex.
+  \[
+    \mathrm{VR}_{t_1}(X_d)\subseteq
+    \mathrm{VR}_{t_2}(X_d)\subseteq\cdots,
+    \qquad t_1\leq t_2.
+  \]
+
+  \begin{columns}[T,onlytextwidth]
+    \column{0.47\textwidth}
+      \term{Barcode interpretation}
+      \begin{itemize}
+        \item birth: a feature appears
+        \item death: the feature disappears
+        \item long bar: persistence over a wider scale range
+      \end{itemize}
+
+    \column{0.47\textwidth}
+      \term{Role of $H_1$}
+      \begin{itemize}
+        \item detects loops in the similarity space
+        \item serves as a secondary analysis
+        \item weak or short-lived loops remain reportable
+      \end{itemize}
+  \end{columns}
+
+  \caution{$H_1$ loops are not direct trust cycles in the original network.}
+  \note{可用空三角形与 filled triangle 的区别解释 H1。不要给每个 H1 bar 强行配社会学含义。}
+\end{frame}
+
+% 10
+\begin{frame}{Comparing temporal windows}
+  Each window produces Betti curves
+  \[
+    \beta_k^d(t)=\dim H_k\!\left(\mathrm{VR}_t(X_d)\right),
+    \qquad k\in\{0,1\}.
+  \]
+
+  Compare windows with an $l_1$ distance
+  \[
+    D_k(d_i,d_j)=\int_0^1
+    \left|\widetilde{\beta}_k^{d_i}(t)-
+    \widetilde{\beta}_k^{d_j}(t)\right|\,dt.
+  \]
+
+  \vspace{0.15cm}
+  \centering
+  {\large
+  Betti curves $\longrightarrow$ distance matrix $\longrightarrow$ window dendrogram}
+
+  \vspace{0.35cm}
+  \begin{block}{Two different dendrograms}
+    User dendrograms describe structure within a window. The final dendrogram compares the windows themselves.
+  \end{block}
+  \note{如果每个窗口人数不同，优先使用归一化 beta0。窗口之间不需要逐个匹配相同用户，而是比较统一尺度区间上的曲线。}
+\end{frame}
+
+% 11
+\begin{frame}{Planned outputs and interpretation}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+      \term{Outputs}
+      \begin{itemize}
+        \item activity over time
+        \item representative user dendrograms
+        \item $H_0$ and $H_1$ barcodes
+        \item Betti curves across windows
+        \item window-distance heatmap
+        \item temporal-window dendrogram
+      \end{itemize}
+
+    \column{0.48\textwidth}
+      \term{Possible interpretations}
+      \begin{itemize}
+        \item Faster $\beta_0$ decrease: users connect at smaller scales.
+        \item Persistent $H_1$: more complex similarity structure.
+        \item Separate window branches: possible temporal regimes.
+        \item Similar curves: relative stability under this representation.
+      \end{itemize}
+  \end{columns}
+
+  \vspace{0.35cm}
+  These are hypotheses to examine, not current findings.
+  \note{展示最终报告可能包含哪些图。口头使用 possible / we will test whether，避免 we found。}
+\end{frame}
+
+% 12
+\begin{frame}{Scope, feasibility, and limitations}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+      \term{Deliberate scope}
+      \begin{itemize}
+        \item one main distance: Jaccard
+        \item one main linkage: single linkage
+        \item homology in dimensions 0 and 1
+        \item at most 200 users per window
+        \item no higher-dimensional computation
+      \end{itemize}
+
+    \column{0.48\textwidth}
+      \term{Main limitations}
+      \begin{itemize}
+        \item rating strength is reduced to positive or non-positive
+        \item negative ratings do not enter the main distance
+        \item window width and activity threshold affect the output
+        \item Jaccard similarity does not imply direct mutual trust
+        \item the analysis does not establish causality
+      \end{itemize}
+  \end{columns}
+  \note{这一页用来说明项目可控。局限不是缺点清单，而是表明我们理解 representation 做了哪些取舍。}
+\end{frame}
+
+% 13
+\begin{frame}{Proposed project and requested feedback}
+  \begin{block}{Summary}
+    The project represents each temporal window as a pseudometric space, computes persistent topological summaries, and clusters windows through distances between their Betti curves.
+  \end{block}
+
+  \vspace{0.25cm}
+  \term{Questions for discussion}
+  \begin{itemize}
+    \item Is the Jaccard representation appropriate for this project?
+    \item Are six-month windows a reasonable initial choice?
+    \item Is a primary focus on $H_0$, with $H_1$ as secondary, sufficient?
+    \item Should we compare raw or normalised Betti curves?
+  \end{itemize}
+
+  \vfill
+  \centering
+  {\Large\color{Ocean}\textbf{Thank you}}
+  \note{结尾重述完整 pipeline，并主动向老师确认四个具体选择。不要问过于宽泛的“这个项目可以吗”。}
+\end{frame}
+
+% ---------- Backup slides ----------
+\appendix
+
+\begin{frame}[noframenumbering]{Backup: likely questions}
+  \small
+  \term{Why TDA instead of ordinary community detection?}\\
+  TDA follows connected components and higher-order structure across all distance thresholds rather than returning only one partition.
+
+  \vspace{0.35cm}
+  \term{Why Jaccard distance?}\\
+  Each user is represented by a finite set of positively rated users. Jaccard distance directly compares the overlap of these sets.
+
+  \vspace{0.35cm}
+  \term{Why is the user space a pseudometric space?}\\
+  Two different users may have identical positive-trust neighbourhoods and therefore distance zero.
+
+  \vspace{0.35cm}
+  \term{What if no clear clusters appear?}\\
+  We will report that the selected representation does not reveal strongly separated behavioural groups or temporal regimes.
+\end{frame}
+
+\begin{frame}[noframenumbering]{Backup: parameter checks}
+  Before the main analysis, we will examine
+  \begin{itemize}
+    \item ratings and active users per six-month window
+    \item the effect of minimum activity thresholds 2 and 3
+    \item whether the 200-user cap removes a substantial share of activity
+    \item sensitivity to nearby window widths if the default is too sparse
+    \item raw versus normalised $\beta_0$ curves
+  \end{itemize}
+
+  \vspace{0.35cm}
+  Parameter changes will be documented and applied consistently across windows.
+\end{frame}
+
+\begin{frame}[noframenumbering]{References}
+  \small
+  \begin{thebibliography}{9}
+    \bibitem{snap}
+      Stanford Network Analysis Project.
+      \newblock \emph{Bitcoin Alpha trust weighted signed network}.
+      \newblock \href{https://snap.stanford.edu/data/soc-sign-bitcoin-alpha.html}{snap.stanford.edu/data/soc-sign-bitcoin-alpha.html}
+
+    \bibitem{kumar2016}
+      S. Kumar, F. Spezzano, V. S. Subrahmanian, and C. Faloutsos.
+      \newblock \emph{Edge Weight Prediction in Weighted Signed Networks}.
+      \newblock IEEE International Conference on Data Mining, 2016.
+
+    \bibitem{course}
+      SF2956 Topological Data Analysis.
+      \newblock Course notes and lecture handouts, 2026.
+  \end{thebibliography}
+\end{frame}
+
+\end{document}
